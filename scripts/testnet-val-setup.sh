@@ -37,7 +37,8 @@ DAEMON=regen
 DENOM=uregen
 CHAIN_ID=regen-redwood-1
 LEAD_NODE_IP=209.182.218.23
-PERSISTENT_PEERS="a5528d8f5fabd3d50e91e8d6a97e355403c5b842@${LEAD_NODE_IP}:26656"
+LEAD_NODE_ID=61f53f226a4a71968a87583f58902405e289b4b9
+PERSISTENT_PEERS="${LEAD_NODE_ID}@${LEAD_NODE_IP}:26656"
 
 echo "install regen-ledger"
 git clone https://github.com/regen-network/regen-ledger $GOPATH/src/github.com/regen-network/regen-ledger
