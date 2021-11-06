@@ -1,5 +1,14 @@
 #!/bin/bash
 
+YOUR_KEY_NAME=$1
+YOUR_NAME=$2
+DAEMON=regen
+DENOM=uregen
+CHAIN_ID=regen-redwood-1
+LEAD_NODE_IP=209.182.218.23
+LEAD_NODE_ID=61f53f226a4a71968a87583f58902405e289b4b9
+PERSISTENT_PEERS="${LEAD_NODE_ID}@${LEAD_NODE_IP}:26656"
+
 command_exists () {
     type "$1" &> /dev/null ;
 }
@@ -19,7 +28,7 @@ else
   echo 'export GOPATH=$HOME/go' >> ~/.profile
   echo 'export GOROOT=/usr/local/go' >> ~/.profile
   echo 'export GOBIN=$GOPATH/bin' >> ~/.profile
-  echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.profile
+  echo 'export PATH=$PATH:~/.$DAEMON/cosmovisor/current/bin:/usr/local/go/bin:$GOBIN' >> ~/.profile
 
   #source ~/.profile
   . ~/.profile
@@ -27,18 +36,9 @@ else
   go version
 fi
 
-echo "-- Clear old regen data and install Regen-ledger and setup the node --"
+echo "-- Clear old data and install Regen-ledger and setup the node --"
 
-rm -rf ~/.regen
-
-YOUR_KEY_NAME=$1
-YOUR_NAME=$2
-DAEMON=regen
-DENOM=uregen
-CHAIN_ID=regen-redwood-1
-LEAD_NODE_IP=209.182.218.23
-LEAD_NODE_ID=61f53f226a4a71968a87583f58902405e289b4b9
-PERSISTENT_PEERS="${LEAD_NODE_ID}@${LEAD_NODE_IP}:26656"
+rm -rf ~/.$DAEMON
 
 echo "install regen-ledger"
 git clone https://github.com/regen-network/regen-ledger $GOPATH/src/github.com/regen-network/regen-ledger
@@ -58,7 +58,7 @@ echo ""
 
 echo "Setting up your validator"
 $DAEMON init --chain-id $CHAIN_ID $YOUR_NAME
-curl http://$LEAD_NODE_IP:26657/genesis | jq .result.genesis > ~/.regen/config/genesis.json
+curl http://$LEAD_NODE_IP:26657/genesis | jq .result.genesis > ~/.$DAEMON/config/genesis.json
 
 
 echo "----------Setting config for seed node---------"
@@ -78,9 +78,9 @@ make cosmovisor
 cp cosmovisor $GOBIN/cosmovisor
 
 echo "Setting up cosmovisor directories"
-mkdir -p ~/.regen/cosmovisor
-mkdir -p ~/.regen/cosmovisor/genesis/bin
-cp $GOBIN/regen ~/.regen/cosmovisor/genesis/bin
+mkdir -p ~/.$DAEMON/cosmovisor
+mkdir -p ~/.$DAEMON/cosmovisor/genesis/bin
+cp $GOBIN/$DAEMON ~/.$DAEMON/cosmovisor/genesis/bin
 
 echo "---------Creating system file---------"
 
@@ -88,7 +88,7 @@ echo "[Unit]
 Description=Cosmovisor daemon
 After=network-online.target
 [Service]
-Environment="DAEMON_NAME=regen"
+Environment="DAEMON_NAME=${DAEMON}"
 Environment="DAEMON_HOME=${HOME}/.${DAEMON}"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=on"
 User=${USER}
