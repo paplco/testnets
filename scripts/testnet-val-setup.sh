@@ -105,9 +105,10 @@ sudo -S systemctl daemon-reload
 sudo -S systemctl start cosmovisor
 
 echo
-echo "Your account address is :"
-$DAEMON keys show $YOUR_KEY_NAME -a
-echo "Your node setup is done. You would need some tokens to start your validator. You can get some tokens from the faucet: http://${LEAD_NODE_IP}:8000/faucet/<address>"
+echo "To see your account address, enter passphrase."
+ACCOUNT_ADDR=$($DAEMON keys show $YOUR_KEY_NAME -a)
+echo "Account address: ${ACCOUNT_ADDR}"
+echo "Your node setup is done. You would need some tokens to start your validator. You can get some tokens from the faucet: http://${LEAD_NODE_IP}:8000/faucet/${ACCOUNT_ADDR}"
 echo
 echo
 echo "After receiving tokens, you can create your validator by running"
